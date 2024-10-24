@@ -1,12 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'jenkins/jenkins:lts'
-            volumes {
-                hostPath volume: '/home/elliot/.minikube/profiles/minikube', containerPath: '/minikube'
-            }
-        }
-    }
+    agent any
 
     environment {
         DOCKER_HUB_CREDENTIALS = credentials('dockerhub')
@@ -15,7 +8,7 @@ pipeline {
         DOCKER_IMAGE_TAG = 'latest'
         WEBAPP_HELM_CHART = '/home/elliot/Desktop/test/test-project/my-kube'
         PROMETHEUS_HELM_CHART = '/home/elliot/Desktop/test/test-project/my-prometheous/my-prom'
-        KUBECONFIG = '/minikube/config'  // Update the KUBECONFIG to match the mounted path
+        KUBECONFIG = '/minikube/config'
     }
 
     stages {
@@ -60,12 +53,14 @@ pipeline {
             steps {
                 script {
                     echo 'Deploying Web App using Helm...'
-                    sh """
-                        export KUBECONFIG=${KUBECONFIG}
-                        helm upgrade --install project6 ${WEBAPP_HELM_CHART} \
-                        --set image.repository=${DOCKER_HUB_REPO} \
-                        --set image.tag=${DOCKER_IMAGE_TAG}
-                    """
+                    docker.image('jenkins/jenkins:lts').inside("--volume=/home/elliot/.minikube/profiles/minikube:/minikube") {
+                        sh """
+                            export KUBECONFIG=${KUBECONFIG}
+                            helm upgrade --install project6 ${WEBAPP_HELM_CHART} \
+                            --set image.repository=${DOCKER_HUB_REPO} \
+                            --set image.tag=${DOCKER_IMAGE_TAG}
+                        """
+                    }
                 }
             }
         }
@@ -74,11 +69,13 @@ pipeline {
             steps {
                 script {
                     echo 'Deploying Prometheus using Helm...'
-                    sh """
-                        export KUBECONFIG=${KUBECONFIG}
-                        helm upgrade --install my-prometheus ${PROMETHEUS_HELM_CHART} \
-                        --set prometheus.image.tag=${DOCKER_IMAGE_TAG}
-                    """
+                    docker.image('jenkins/jenkins:lts').inside("--volume=/home/elliot/.minikube/profiles/minikube:/minikube") {
+                        sh """
+                            export KUBECONFIG=${KUBECONFIG}
+                            helm upgrade --install my-prometheus ${PROMETHEUS_HELM_CHART} \
+                            --set prometheus.image.tag=${DOCKER_IMAGE_TAG}
+                        """
+                    }
                 }
             }
         }
