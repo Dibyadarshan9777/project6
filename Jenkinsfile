@@ -1,5 +1,12 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'jenkins/jenkins:lts'
+            volumes {
+                hostPath volume: '/home/elliot/.minikube/profiles/minikube', containerPath: '/minikube'
+            }
+        }
+    }
 
     environment {
         DOCKER_HUB_CREDENTIALS = credentials('dockerhub')
@@ -8,7 +15,7 @@ pipeline {
         DOCKER_IMAGE_TAG = 'latest'
         WEBAPP_HELM_CHART = '/home/elliot/Desktop/test/test-project/my-kube'
         PROMETHEUS_HELM_CHART = '/home/elliot/Desktop/test/test-project/my-prometheous/my-prom'
-        KUBECONFIG = '/home/jenkins/.kube/config'
+        KUBECONFIG = '/minikube/config'  // Update the KUBECONFIG to match the mounted path
     }
 
     stages {
