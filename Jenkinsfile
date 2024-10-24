@@ -19,7 +19,17 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
+                    echo 'Building Docker image...'
                     docker.build("${env.DOCKER_HUB_REPO}:latest")
+                }
+            }
+        }
+
+        stage('Login to Docker Hub') {
+            steps {
+                script {
+                    echo 'Logging into Docker Hub...'
+                    sh "echo \$DOCKER_HUB_CREDENTIALS_PSW | docker login -u \$DOCKER_HUB_CREDENTIALS_USR --password-stdin"
                 }
             }
         }
@@ -27,7 +37,8 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_HUB_CREDENTIALS) {
+                    echo 'Pushing Docker image to Docker Hub...'
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
                         docker.image("${env.DOCKER_HUB_REPO}:latest").push('latest')
                     }
                 }
