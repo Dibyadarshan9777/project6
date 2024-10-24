@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_CREDENTIALS = credentials('Dockerhub')
+        DOCKER_HUB_CREDENTIALS = credentials('dockerhub')
         GITHUB_CREDENTIALS = credentials('github')
         DOCKER_HUB_REPO = 'dibyadarshandevops/project6'
     }
