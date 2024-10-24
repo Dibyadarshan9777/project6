@@ -10,7 +10,9 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'master', credentialsId: "${GITHUB_CREDENTIALS}", url: 'https://github.com/Dibyadarshan9777/project6.git'
+                script {
+                    git branch: 'master', credentialsId: 'github', url: 'https://github.com/Dibyadarshan9777/project6.git'
+                }
             }
         }
 
@@ -25,7 +27,7 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', "${DOCKER_HUB_CREDENTIALS}") {
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_HUB_CREDENTIALS) {
                         docker.image("${env.DOCKER_HUB_REPO}:latest").push('latest')
                     }
                 }
