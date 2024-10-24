@@ -11,7 +11,7 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 // Clone the Git repository using the specified credentials
-                git branch: 'main', credentialsId: "${GITHUB_CREDENTIALS}", url: 'https://github.com/Dibyadarshan9777/project6.git'
+                git branch: 'master', credentialsId: "${GITHUB_CREDENTIALS}", url: 'https://github.com/Dibyadarshan9777/project6.git'
             }
         }
 
