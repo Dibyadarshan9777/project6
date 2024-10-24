@@ -5,9 +5,10 @@ pipeline {
         DOCKER_HUB_CREDENTIALS = credentials('dockerhub')
         GITHUB_CREDENTIALS = credentials('github')
         DOCKER_HUB_REPO = 'dibyadarshandevops/project6'
-        DOCKER_IMAGE_TAG = 'latest'  // Define the image tag, you can also set this dynamically
-        WEBAPP_HELM_CHART = '/home/elliot/Desktop/test/test-project/my-kube'  // Path to your web app Helm chart
-        PROMETHEUS_HELM_CHART = '/home/elliot/Desktop/test/test-project/my-prometheous/my-prom'  // Path to your Prometheus Helm chart
+        DOCKER_IMAGE_TAG = 'latest'
+        WEBAPP_HELM_CHART = '/home/elliot/Desktop/test/test-project/my-kube'
+        PROMETHEUS_HELM_CHART = '/home/elliot/Desktop/test/test-project/my-prometheous/my-prom'
+        KUBECONFIG = '/home/jenkins/.kube/config'
     }
 
     stages {
@@ -53,6 +54,7 @@ pipeline {
                 script {
                     echo 'Deploying Web App using Helm...'
                     sh """
+                        export KUBECONFIG=${KUBECONFIG}
                         helm upgrade --install project6 ${WEBAPP_HELM_CHART} \
                         --set image.repository=${DOCKER_HUB_REPO} \
                         --set image.tag=${DOCKER_IMAGE_TAG}
@@ -66,6 +68,7 @@ pipeline {
                 script {
                     echo 'Deploying Prometheus using Helm...'
                     sh """
+                        export KUBECONFIG=${KUBECONFIG}
                         helm upgrade --install my-prometheus ${PROMETHEUS_HELM_CHART} \
                         --set prometheus.image.tag=${DOCKER_IMAGE_TAG}
                     """
